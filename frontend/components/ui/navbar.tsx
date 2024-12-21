@@ -10,8 +10,8 @@ import OktoConnect from "./OktoConnect";
 
 const navItems = [
   {
-    name: "Portfolio",
-    href: "/",
+    name: "Talk to a specific Agent",
+    href: "/agents",
     icon: ChartBarIcon
   },
   {
