@@ -83,9 +83,9 @@ export function AgentCharacters({ agents }: AgentCharactersProps) {
     switch (agentKey) {
       case 'tradingAgent':
         return '/agent_trader.png';
-      case 'liquidityAgent':
+      case 'lendingAgent':
         return '/agent_analyst.png';
-      case 'portfolioAgent':
+      case 'stakingAgent':
         return '/agent_researcher.png';
       case 'defiLlamaAgent':
         return '/agent_default.png';

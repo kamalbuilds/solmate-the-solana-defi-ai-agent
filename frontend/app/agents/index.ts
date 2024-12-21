@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import {
     type BrianAgentOptions,
     BrianToolkit,
@@ -12,7 +12,7 @@ import { createToolCallingAgent, AgentExecutor } from "langchain/agents";
 import { ChatMessageHistory } from "langchain/memory";
 import { DynamicStructuredTool } from "langchain/tools";
 import { z } from "zod";
-import { FunctorService } from '../services/functorService.ts';
+import { FunctorService } from '../services/functorService';
 import { KestraService } from '../services/kestraService';
 import { SolanaAgentKit } from "solana-agent-kit";
 import { PublicKey } from "@solana/web3.js";
@@ -180,6 +180,7 @@ const solanaTools = {
             inputMint: z.string().optional().describe("Input token mint address"),
             slippageBps: z.number().optional().describe("Slippage in basis points")
         }),
+
         func: async ({ outputMint, inputAmount, inputMint, slippageBps }) => {
             const solanaAgent = new SolanaAgentKit(
                 process.env["NEXT_PUBLIC_SOLANA_PRIVATE_KEY"] as string,
@@ -310,12 +311,6 @@ export const createSpecializedAgents = async (baseOptions: BrianAgentOptions): P
             name: 'Staking Agent',
             description: 'Handles Solana staking operations',
             agent: stakingAgent
-        },
-        {
-            id: 'liquidity',
-            name: 'Liquidity Pool Agent',
-            description: 'Analyzes liquidity pools and provides insights',
-            agent: liquidityAgent
         },
         {
             id: 'portfolio',

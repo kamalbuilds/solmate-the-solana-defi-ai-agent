@@ -39,6 +39,7 @@
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-query": "^3.39.3",
+    "solana-agent-kit": "^1.2.0",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "tailwind-merge": "^2.5.5",
