@@ -14,6 +14,8 @@ import { DynamicStructuredTool } from "langchain/tools";
 import { z } from "zod";
 import { FunctorService } from '../services/functorService.ts';
 import { KestraService } from '../services/kestraService';
+import { SolanaAgentKit } from "solana-agent-kit";
+import { PublicKey } from "@solana/web3.js";
 
 // Initialize Kestra service
 const kestraService = new KestraService();
@@ -149,6 +151,67 @@ const kestraTools = [
     })
 ];
 
+// Add Solana tools
+const solanaTools = {
+    lendingTool: new DynamicStructuredTool({
+        name: "solana_lend_assets",
+        description: "Lend assets on Solana protocols like Meteora",
+        schema: z.object({
+            assetMint: z.string().describe("Token mint address"),
+            amount: z.number().describe("Amount to lend"),
+            protocol: z.enum(["meteora", "solend"]).describe("Lending protocol to use")
+        }),
+        func: async ({ assetMint, amount, protocol }) => {
+            const solanaAgent = new SolanaAgentKit(
+                process.env["NEXT_PUBLIC_SOLANA_PRIVATE_KEY"] as string,
+                process.env["NEXT_PUBLIC_SOLANA_RPC_URL"] as string,
+                process.env["NEXT_PUBLIC_OPENAI_API_KEY"] as string
+            );
+            return await solanaAgent.lendAssets(new PublicKey(assetMint), amount);
+        }
+    }),
+
+    tradingTool: new DynamicStructuredTool({
+        name: "solana_trade_tokens",
+        description: "Execute token swaps on Jupiter Exchange",
+        schema: z.object({
+            outputMint: z.string().describe("Output token mint address"),
+            inputAmount: z.number().describe("Input amount"),
+            inputMint: z.string().optional().describe("Input token mint address"),
+            slippageBps: z.number().optional().describe("Slippage in basis points")
+        }),
+        func: async ({ outputMint, inputAmount, inputMint, slippageBps }) => {
+            const solanaAgent = new SolanaAgentKit(
+                process.env["NEXT_PUBLIC_SOLANA_PRIVATE_KEY"] as string,
+                process.env["NEXT_PUBLIC_SOLANA_RPC_URL"] as string,
+                process.env["NEXT_PUBLIC_OPENAI_API_KEY"] as string
+            );
+            return await solanaAgent.trade(
+                new PublicKey(outputMint),
+                inputAmount,
+                inputMint ? new PublicKey(inputMint) : undefined,
+                slippageBps
+            );
+        }
+    }),
+
+    stakingTool: new DynamicStructuredTool({
+        name: "solana_stake",
+        description: "Stake SOL tokens",
+        schema: z.object({
+            amount: z.number().describe("Amount of SOL to stake")
+        }),
+        func: async ({ amount }) => {
+            const solanaAgent = new SolanaAgentKit(
+                process.env["NEXT_PUBLIC_SOLANA_PRIVATE_KEY"] as string,
+                process.env["NEXT_PUBLIC_SOLANA_RPC_URL"] as string,
+                process.env["NEXT_PUBLIC_OPENAI_API_KEY"] as string
+            );
+            return await solanaAgent.stake(amount);
+        }
+    })
+};
+
 export interface Agent {
     id: string;
     name: string;
@@ -157,33 +220,35 @@ export interface Agent {
 }
 
 export const createSpecializedAgents = async (baseOptions: BrianAgentOptions): Promise<Agent[]> => {
-    // Trading Agent with Kestra orchestration
+    // Trading Agent with Solana capabilities
     const tradingAgent = await createAgent({
         ...baseOptions,
-        tools: [...kestraTools, coingeckoTool],
-        instructions: `You are a specialized trading agent with workflow orchestration capabilities.
-            You can execute and monitor complex trading operations using Kestra workflows.
-            Focus on price analysis and trading opportunities.`,
+        tools: [
+            coingeckoTool,
+            solanaTools.tradingTool,
+            defiLlamaToolkit.getTVLTool
+        ],
+        instructions: "You are a trading specialist with Solana DeFi capabilities. Help users execute trades and analyze opportunities.",
     });
 
-    // Liquidity Pool Agent
-    const liquidityAgent = await createAgent({
+    // Lending Agent with Solana capabilities
+    const lendingAgent = await createAgent({
         ...baseOptions,
-        tools: [defiLlamaToolkit.getTVLTool],
-        instructions: "You are a liquidity pool specialist. Help users find and analyze liquidity pools.",
+        tools: [
+            solanaTools.lendingTool,
+            defiLlamaToolkit.getYieldsTool
+        ],
+        instructions: "You are a lending specialist on Solana. Help users find and execute lending opportunities.",
     });
 
-    // DeFiLlama Analysis Agent
-    const defiLlamaAgent = await createAgent({
+    // Staking Agent with Solana capabilities
+    const stakingAgent = await createAgent({
         ...baseOptions,
-        tools: Object.values(defiLlamaToolkit),
-        instructions: `You are a DeFi analytics specialist powered by DeFiLlama data.
-            You can:
-            - Track TVL across protocols and chains
-            - Analyze yield opportunities and APY trends
-            - Monitor DEX volumes and trading activity
-            - Compare different protocols and chains
-            Always provide data-driven insights and recommendations.`,
+        tools: [
+            solanaTools.stakingTool,
+            defiLlamaToolkit.getTVLTool
+        ],
+        instructions: "You are a staking specialist on Solana. Help users stake their assets and maximize yields.",
     });
 
     // Update Portfolio Agent with orchestration capabilities
@@ -214,12 +279,37 @@ export const createSpecializedAgents = async (baseOptions: BrianAgentOptions): P
             Help users optimize their portfolio allocation while maintaining efficiency and security.`
     });
 
+    // DeFiLlama Analysis Agent
+    const defiLlamaAgent = await createAgent({
+        ...baseOptions,
+        tools: Object.values(defiLlamaToolkit),
+        instructions: `You are a DeFi analytics specialist powered by DeFiLlama data.
+            You can:
+            - Track TVL across protocols and chains
+            - Analyze yield opportunities and APY trends
+            - Monitor DEX volumes and trading activity
+            - Compare different protocols and chains
+            Always provide data-driven insights and recommendations.`,
+    });
+
     return [
         {
             id: 'trading',
             name: 'Trading Agent',
-            description: 'Specializes in price analysis and trading opportunities',
+            description: 'Specializes in Solana trading and price analysis',
             agent: tradingAgent
+        },
+        {
+            id: 'lending',
+            name: 'Lending Agent',
+            description: 'Manages lending positions on Solana protocols',
+            agent: lendingAgent
+        },
+        {
+            id: 'staking',
+            name: 'Staking Agent',
+            description: 'Handles Solana staking operations',
+            agent: stakingAgent
         },
         {
             id: 'liquidity',
