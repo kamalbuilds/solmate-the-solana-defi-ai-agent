@@ -20,14 +20,14 @@ export default function DeFiAgentCard({ agent, onSelect }: Props) {
                 />
                 <div>
                     <h3 className="font-medium">{agent.name}</h3>
-                    <p className="text-sm text-gray-500">{agent.type}</p>
+                    <p className="text-sm text-black">{agent.type}</p>
                 </div>
             </div>
             <div className="mt-3">
-                <p className="text-sm">Protocols: {agent.protocols.join(", ")}</p>
+                <p className="text-sm">Protocols: {agent.protocols?.join(", ")}</p>
                 <div className="flex flex-wrap gap-2 mt-2">
-                    {agent.capabilities.map(cap => (
-                        <span key={cap} className="px-2 py-1 text-xs bg-gray-100 rounded">
+                    {agent.capabilities?.map(cap => (
+                        <span key={cap} className="px-2 py-1 text-xs text-black bg-gray-100 rounded">
                             {cap}
                         </span>
                     ))}

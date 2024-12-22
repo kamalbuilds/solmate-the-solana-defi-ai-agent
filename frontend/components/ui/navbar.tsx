@@ -7,6 +7,7 @@ import { ConnectButton, lightTheme } from "thirdweb/react";
 import { client } from "@/app/client";
 import { avalanche, avalancheFuji, ethereum, modeTestnet, bsc, base } from "thirdweb/chains";
 import OktoConnect from "./OktoConnect";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 const navItems = [
   {
@@ -75,7 +76,7 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <OktoConnect />
+            <WalletMultiButton style={{ fontSize: '0.75rem !important', height: '2.5rem !important' }} />
             {/* <ConnectButton
               client={client}
               theme={lightTheme()}

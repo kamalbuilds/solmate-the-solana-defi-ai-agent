@@ -377,7 +377,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex my-16">
+    <main className="flex my-16 ">
       {/* Left Sidebar - Agent Details */}
       <div className="w-1/4 border-r border-gray-200 p-4 overflow-y-auto">
         <h2 className="text-lg font-semibold mb-4">Available Agents</h2>

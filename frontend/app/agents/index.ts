@@ -1,4 +1,3 @@
-
 import {
     type BrianAgentOptions,
     BrianToolkit,
@@ -16,7 +15,7 @@ import { FunctorService } from '../services/functorService';
 import { KestraService } from '../services/kestraService';
 import { SolanaAgentKit } from "solana-agent-kit";
 import { PublicKey } from "@solana/web3.js";
-
+import { SolanaAssistant } from "@/lib/agents/research-agent";
 // Initialize Kestra service
 const kestraService = new KestraService();
 
@@ -125,31 +124,6 @@ const coingeckoTool = new DynamicStructuredTool({
     },
 });
 
-// Add Kestra tools
-const kestraTools = [
-    new DynamicStructuredTool({
-        name: "execute_workflow",
-        description: "Execute a Kestra workflow for orchestrated operations",
-        schema: z.object({
-            namespace: z.string(),
-            flowId: z.string(),
-            inputs: z.any().optional()
-        }),
-        func: async ({ namespace, flowId, inputs }) => {
-            return await kestraService.executeWorkflow(namespace, flowId, inputs);
-        }
-    }),
-    new DynamicStructuredTool({
-        name: "check_workflow_status",
-        description: "Check the status of a Kestra workflow execution",
-        schema: z.object({
-            executionId: z.string()
-        }),
-        func: async ({ executionId }) => {
-            return await kestraService.getExecutionStatus(executionId);
-        }
-    })
-];
 
 // Add Solana tools
 const solanaTools = {
@@ -216,12 +190,16 @@ const solanaTools = {
 export interface Agent {
     id: string;
     name: string;
+    type: string;
+    status: string;
     description: string;
+    capabilities: string[];
+    protocols: string[];
     agent: RunnableWithMessageHistory<Record<string, any>, ChainValues>;
 }
 
 export const createSpecializedAgents = async (baseOptions: BrianAgentOptions): Promise<Agent[]> => {
-    // Trading Agent with Solana capabilities
+    // Trading Agent
     const tradingAgent = await createAgent({
         ...baseOptions,
         tools: [
@@ -232,34 +210,33 @@ export const createSpecializedAgents = async (baseOptions: BrianAgentOptions): P
         instructions: "You are a trading specialist with Solana DeFi capabilities. Help users execute trades and analyze opportunities.",
     });
 
-    // Lending Agent with Solana capabilities
-    const lendingAgent = await createAgent({
+    // Research Agent
+    const researchAgent = await createAgent({
+        ...baseOptions,
+        tools: [
+            coingeckoTool,
+            defiLlamaToolkit.getTVLTool,
+            defiLlamaToolkit.getYieldsTool
+        ],
+        instructions: "You are a DeFi research specialist. Provide in-depth analysis of protocols, markets, and trends.",
+    });
+
+    // Liquidity Agent
+    const liquidityAgent = await createAgent({
         ...baseOptions,
         tools: [
             solanaTools.lendingTool,
             defiLlamaToolkit.getYieldsTool
         ],
-        instructions: "You are a lending specialist on Solana. Help users find and execute lending opportunities.",
+        instructions: "You are a liquidity management specialist. Help users manage liquidity pools and optimize yield strategies.",
     });
 
-    // Staking Agent with Solana capabilities
-    const stakingAgent = await createAgent({
-        ...baseOptions,
-        tools: [
-            solanaTools.stakingTool,
-            defiLlamaToolkit.getTVLTool
-        ],
-        instructions: "You are a staking specialist on Solana. Help users stake their assets and maximize yields.",
-    });
-
-    // Update Portfolio Agent with orchestration capabilities
+    // Portfolio Agent
     const portfolioAgent = await createAgent({
         ...baseOptions,
         tools: [
-            ...kestraTools,
             coingeckoTool,
             defiLlamaToolkit.getTVLTool,
-            // Add new orchestration tools
             new DynamicStructuredTool({
                 name: "execute_cross_chain_rebalance",
                 description: "Execute portfolio rebalancing across multiple chains",
@@ -272,16 +249,13 @@ export const createSpecializedAgents = async (baseOptions: BrianAgentOptions): P
                         targetAddress: z.string()
                     }))
                 }),
-
             })
         ],
-        instructions: `You are a portfolio management specialist with cross-chain orchestration capabilities.
-            You can orchestrate complex portfolio operations across multiple chains.
-            Help users optimize their portfolio allocation while maintaining efficiency and security.`
+        instructions: "You are a portfolio management specialist with cross-chain orchestration capabilities. Help users optimize their portfolio allocation.",
     });
 
-    // DeFiLlama Analysis Agent
-    const defiLlamaAgent = await createAgent({
+    // DeFi Analytics Agent
+    const defiAnalyticsAgent = await createAgent({
         ...baseOptions,
         tools: Object.values(defiLlamaToolkit),
         instructions: `You are a DeFi analytics specialist powered by DeFiLlama data.
@@ -293,36 +267,99 @@ export const createSpecializedAgents = async (baseOptions: BrianAgentOptions): P
             Always provide data-driven insights and recommendations.`,
     });
 
+    const solanaLendingAgent = await createAgent({
+        ...baseOptions,
+        tools: [solanaTools.lendingTool, defiLlamaToolkit.getYieldsTool],
+        instructions: "You are a lending specialist on Solana. Help users find and execute lending opportunities.",
+    });
+
+    const solanaStakingAgent = await createAgent({
+        ...baseOptions,
+        tools: [solanaTools.stakingTool, defiLlamaToolkit.getTVLTool],
+        instructions: "You are a staking specialist on Solana. Help users find and execute staking opportunities.",
+    });
+
+
     return [
         {
-            id: 'trading',
-            name: 'Trading Agent',
-            description: 'Specializes in Solana trading and price analysis',
+            id: "trading",
+            name: "Trading Agent",
+            type: "trading",
+            status: "active",
+            description: "Specialized in analyzing market conditions and executing optimal trading strategies",
+            capabilities: ["Perp trading", "Take profit/Stop loss", "Position sizing"],
+            protocols: ["Jupiter", "Mango Markets"],
             agent: tradingAgent
         },
         {
-            id: 'lending',
-            name: 'Lending Agent',
-            description: 'Manages lending positions on Solana protocols',
-            agent: lendingAgent
+            id: "research",
+            name: "Research Agent",
+            type: "research",
+            status: "active",
+            description: "Provides in-depth analysis and research on DeFi protocols and market trends",
+            capabilities: ["Market analysis", "Protocol research", "Risk assessment"],
+            protocols: ["DeFi Llama", "Token Terminal"],
+            agent: researchAgent
         },
         {
-            id: 'staking',
-            name: 'Staking Agent',
-            description: 'Handles Solana staking operations',
-            agent: stakingAgent
+            id: "liquidity",
+            name: "Liquidity Agent",
+            type: "liquidity",
+            status: "active",
+            description: "Expert in managing liquidity pools and optimizing yield strategies on solana",
+            capabilities: ["Launch tokens", "Manage liquidity", "Stake-to-earn"],
+            protocols: ["Orca", "Raydium"],
+            agent: liquidityAgent
         },
         {
-            id: 'portfolio',
-            name: 'Portfolio Manager',
-            description: 'Helps optimize portfolio allocation and management',
+            id: "portfolio",
+            name: "Portfolio Manager",
+            type: "portfolio",
+            status: "active",
+            description: "Manages and optimizes your DeFi portfolio across multiple protocols on solana",
+            capabilities: ["Portfolio optimization", "Risk management", "Asset allocation"],
+            protocols: ["All supported protocols"],
             agent: portfolioAgent
         },
         {
-            id: 'defi-analytics',
-            name: 'DeFi Analytics',
-            description: 'Provides comprehensive DeFi market analysis using DeFiLlama data',
-            agent: defiLlamaAgent
+            id: "defi-analytics",
+            name: "DeFi Analytics",
+            type: "analytics",
+            status: "active",
+            description: "Provides comprehensive DeFi market analysis using DeFiLlama data",
+            capabilities: ["TVL tracking", "Yield analysis", "Protocol comparison"],
+            protocols: ["DeFi Llama"],
+            agent: defiAnalyticsAgent
+        },
+        {
+            id: "lending",
+            name: "Lending Agent",
+            type: "lending",
+            status: "active",
+            description: "Manages lending positions and optimizes lending strategies on Solana protocols",
+            capabilities: ["Lend assets", "Monitor positions", "Auto-rebalance"],
+            protocols: ["Meteora", "Solend"],
+            agent: solanaLendingAgent
+        },
+        {
+            id: "staking",
+            name: "Staking Agent",
+            type: "staking",
+            status: "active",
+            description: "Handles Solana staking operations and maximizes staking yields",
+            capabilities: ["Stake SOL", "Monitor rewards", "Auto-compound"],
+            protocols: ["Marinade", "Lido"],
+            agent: solanaStakingAgent
+        },
+        {
+            id: "solana-assistant",
+            name: "Solana Assistant",
+            type: "solana",
+            status: "active",
+            description: "General-purpose Solana blockchain assistant",
+            capabilities: ["Chain analysis", "Transaction help", "Protocol guidance"],
+            protocols: ["Solana"],
+            agent: SolanaAssistant
         }
     ];
 };

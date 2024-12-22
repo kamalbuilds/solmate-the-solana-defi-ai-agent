@@ -6,6 +6,7 @@ import { MainLayout } from "@/components/layouts/MainLayout";
 import { ThirdwebProvider } from "thirdweb/react";
 import { QueryClient, QueryClientProvider } from 'react-query';
 import Provider from "./Provider";
+import AppWalletProvider from "@/components/AppWalletProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,9 +30,9 @@ export default function RootLayout({
       >
         <QueryClientProvider client={queryClient}>
           <Provider>
-            <ThirdwebProvider>
+            <AppWalletProvider>
               <MainLayout>{children}</MainLayout>
-            </ThirdwebProvider>
+            </AppWalletProvider>
           </Provider>
         </QueryClientProvider>
       </body>

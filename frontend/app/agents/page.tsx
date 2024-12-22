@@ -1,44 +1,19 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { DeFiAgent } from "@/lib/types/agent";
+import { DeFiAgent } from "@/lib/config/agents";
 import DeFiAgentCard from "@/components/agents/DeFiAgentCard";
 import { Button } from "@/components/ui/button";
 import { SendHorizontal } from "lucide-react";
 import { initializeAgents } from "./index";
+import { TradingAgent } from '@/lib/agents/trading-agent';
+import { SolanaAssistant } from '@/lib/agents/research-agent';
 
 interface Message {
     role: "user" | "assistant";
     content: string;
     timestamp: string;
 }
-
-const DEFI_AGENTS: DeFiAgent[] = [
-    {
-        id: "lending-1",
-        name: "Lending Agent",
-        type: "lending",
-        avatar: "/agent_default.png",
-        capabilities: ["Lend assets", "Monitor positions", "Auto-rebalance"],
-        protocols: ["Meteora", "Solend"]
-    },
-    {
-        id: "trading-1",
-        name: "Trading Agent",
-        type: "trading",
-        avatar: "/agent_trader.png",
-        capabilities: ["Perp trading", "Take profit/Stop loss", "Position sizing"],
-        protocols: ["Jupiter", "Mango Markets"]
-    },
-    {
-        id: "liquidity-1",
-        name: "Liquidity Agent",
-        type: "liquidity",
-        avatar: "/agent_liquidity.png",
-        capabilities: ["Launch tokens", "Manage liquidity", "Stake-to-earn"],
-        protocols: ["Orca", "Raydium"]
-    }
-];
 
 export default function AgentsPage() {
     const [selectedAgent, setSelectedAgent] = useState<DeFiAgent | null>(null);
@@ -74,6 +49,9 @@ export default function AgentsPage() {
         }]);
     };
 
+    const [tradingAgent] = useState(() => new TradingAgent());
+    const [researchAgent] = useState(() => new SolanaAssistant());
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!input.trim() || !selectedAgent || isProcessing) return;
@@ -89,21 +67,21 @@ export default function AgentsPage() {
         setIsProcessing(true);
 
         try {
-            // Find the corresponding initialized agent
-            const agentInstance = agents.find(a => a.id === selectedAgent.id.split('-')[0])?.agent;
-
-            if (!agentInstance) {
-                throw new Error("Agent not initialized");
+            let response;
+            switch (selectedAgent.id) {
+                case 'trading':
+                    response = await tradingAgent.analyze(input);
+                    break;
+                case 'research':
+                    response = await researchAgent.research(input);
+                    break;
+                default:
+                    response = `${selectedAgent.name} is not yet implemented`;
             }
-
-            const response = await agentInstance.invoke(
-                { input: userMessage.content },
-                { configurable: { sessionId: selectedAgent.id } }
-            );
 
             setMessages(prev => [...prev, {
                 role: "assistant",
-                content: response.output,
+                content: response,
                 timestamp: new Date().toLocaleTimeString()
             }]);
 
@@ -126,7 +104,7 @@ export default function AgentsPage() {
                 <div className="lg:col-span-1">
                     <h1 className="text-3xl font-bold mb-6">DeFi Agents</h1>
                     <div className="space-y-4">
-                        {DEFI_AGENTS.map(agent => (
+                        {agents.map(agent => (
                             <DeFiAgentCard
                                 key={agent.id}
                                 agent={agent}
@@ -139,7 +117,7 @@ export default function AgentsPage() {
                 {/* Chat Interface */}
                 <div className="lg:col-span-2">
                     {selectedAgent ? (
-                        <div className="h-[800px] flex flex-col border rounded-lg bg-white">
+                        <div className="h-[800px] flex flex-col border rounded-lg">
                             {/* Chat Header */}
                             <div className="p-4 border-b">
                                 <div className="flex items-center gap-3">
@@ -151,7 +129,7 @@ export default function AgentsPage() {
                                     <div>
                                         <h2 className="font-semibold">{selectedAgent.name}</h2>
                                         <p className="text-sm text-gray-500">
-                                            {selectedAgent.protocols.join(" • ")}
+                                            {selectedAgent?.protocols.join(" • ")}
                                         </p>
                                     </div>
                                 </div>
@@ -167,7 +145,7 @@ export default function AgentsPage() {
                                         <div
                                             className={`max-w-[80%] p-3 rounded-lg ${message.role === 'user'
                                                 ? 'bg-blue-500 text-white'
-                                                : 'bg-gray-100'
+                                                : 'bg-black'
                                                 }`}
                                         >
                                             <p>{message.content}</p>
@@ -181,7 +159,7 @@ export default function AgentsPage() {
                             </div>
 
                             {/* Input Form */}
-                            <div className="border-t p-4 bg-white">
+                            <div className="border-t p-4">
                                 <form onSubmit={handleSubmit} className="flex gap-2">
                                     <input
                                         type="text"
@@ -202,7 +180,7 @@ export default function AgentsPage() {
                             </div>
                         </div>
                     ) : (
-                        <div className="h-[800px] flex items-center justify-center border rounded-lg bg-white">
+                        <div className="h-[800px] flex items-center justify-center border rounded-lg">
                             <p className="text-gray-500">Select an agent to start chatting</p>
                         </div>
                     )}

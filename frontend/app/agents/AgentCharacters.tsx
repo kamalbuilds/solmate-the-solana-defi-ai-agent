@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { AgentCharacter } from './AgentCharacter';
+import { DEFI_AGENTS } from '@/lib/config/agents';
+import { TradingAgent } from '@/lib/agents/trading-agent';
+import { SolanaAssistant } from '@/lib/agents/research-agent';
 
 interface Agent {
   id: string;
@@ -9,7 +12,8 @@ interface Agent {
   type: string;
   status: string;
   message?: string;
-  agent?: any; // The actual agent instance
+  agent?: any;
+  description: string;
 }
 
 interface AgentCharactersProps {
@@ -19,6 +23,8 @@ interface AgentCharactersProps {
 export function AgentCharacters({ agents }: AgentCharactersProps) {
   const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>({});
   const [isMoving, setIsMoving] = useState<Record<string, boolean>>({});
+  const [tradingAgent] = useState(() => new TradingAgent());
+  const [researchAgent] = useState(() => new ResearchAgent());
 
   // Initialize random positions for agents
   useEffect(() => {
@@ -80,34 +86,14 @@ export function AgentCharacters({ agents }: AgentCharactersProps) {
 
   // Get sprite based on agent type
   const getSprite = (agentKey: string) => {
-    switch (agentKey) {
-      case 'tradingAgent':
-        return '/agent_trader.png';
-      case 'lendingAgent':
-        return '/agent_analyst.png';
-      case 'stakingAgent':
-        return '/agent_researcher.png';
-      case 'defiLlamaAgent':
-        return '/agent_default.png';
-      default:
-        return '/agent_default.png';
-    }
+    const agent = DEFI_AGENTS.find(a => a.id === agentKey);
+    return agent?.avatar || '/agent_default.png';
   };
 
   // Get agent display name
   const getAgentName = (agentKey: string) => {
-    switch (agentKey) {
-      case 'tradingAgent':
-        return 'Trading Agent';
-      case 'liquidityAgent':
-        return 'Liquidity Agent';
-      case 'portfolioAgent':
-        return 'Portfolio Agent';
-      case 'defiLlamaAgent':
-        return 'DeFi Analytics';
-      default:
-        return agentKey;
-    }
+    const agent = DEFI_AGENTS.find(a => a.id === agentKey);
+    return agent?.name || agentKey;
   };
 
   // Get movement direction based on position change
@@ -129,6 +115,21 @@ export function AgentCharacters({ agents }: AgentCharactersProps) {
     }
   };
 
+  // Add message handling
+  const handleAgentMessage = async (agentKey: string, message: string) => {
+    const agent = DEFI_AGENTS.find(a => a.id === agentKey);
+    if (!agent) return 'Agent not found';
+
+    switch (agentKey) {
+      case 'trading':
+        return await tradingAgent.analyze(message);
+      case 'research':
+        return await researchAgent.research(message);
+      default:
+        return `${agent.name} is not yet implemented`;
+    }
+  };
+
   if (!agents) return null;
 
   return (
@@ -143,9 +144,10 @@ export function AgentCharacters({ agents }: AgentCharactersProps) {
             name={getAgentName(agentKey)}
             spriteSrc={getSprite(agentKey)}
             position={position}
-            message={undefined}
+            message={agent.message}
             isMoving={isMoving[agentKey]}
             direction={getDirection(agentKey)}
+            onMessage={(msg) => handleAgentMessage(agentKey, msg)}
           />
         );
       })}

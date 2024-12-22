@@ -1,6 +1,6 @@
 import { AssisterrService } from '../services/assisterr-service';
 
-export class ResearchAgent {
+export class SolanaAssistant {
     private assisterr: AssisterrService;
     private readonly HANDLE_NAME = 'research_assistant';
 
