@@ -1,6 +1,6 @@
 # 🤖 SolMate : Your Reliable Friend in your Defi Journey on Solana
 
-> Multiple specialized autonomous AI agents with powerful tools work together to analyze, recommend, and execute optimal DeFi strategies while maintaining user-defined risk parameters and portfolio goals currently live on Avalanche , Mode , Base, powered by Brian AI and LangChain
+> Where Multiple specialized autonomous AI agents with powerful tools work together to analyze, recommend, and execute optimal DeFi strategies while maintaining user-defined risk parameters and portfolio goals powered by Solana Agent Kit & Langchain.
 
 - risk parameters and portfolio balance
 - Provides real-time feedback and execution status
