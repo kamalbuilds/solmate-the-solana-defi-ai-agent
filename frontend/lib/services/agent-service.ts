@@ -1,5 +1,7 @@
 import { SolanaAgentKit } from "solana-agent-kit";
 import { PublicKey } from "@solana/web3.js";
+import { BN } from "@coral-xyz/anchor";
+import Decimal from "decimal.js";
 
 export class DeFiAgentService {
     private agent: SolanaAgentKit;
@@ -8,7 +10,7 @@ export class DeFiAgentService {
         this.agent = new SolanaAgentKit(
             privateKey,
             rpcUrl || process.env["NEXT_PUBLIC_SOLANA_RPC_URL"] as string,
-            process.env["OPENAI_API_KEY"] as string
+            process.env["NEXT_PUBLIC_OPENAI_API_KEY"] as string
         );
     }
 
@@ -33,11 +35,21 @@ export class DeFiAgentService {
     }
 
     // Liquidity operations
-    async createOrcaWhirlpool(tokenA: string, tokenB: string, feeTier: number) {
-        return await this.agent.createOrcaSingleSidedWhirlpool({
-            tokenMintA: new PublicKey(tokenA),
-            tokenMintB: new PublicKey(tokenB),
+    async createOrcaWhirlpool(
+        depositTokenAmount: BN,
+        tokenA: string,
+        tokenB: string,
+        initialPrice: Decimal,
+        maxPrice: Decimal,
+        feeTier: 1 | 0.01 | 0.02 | 0.04 | 0.05 | 0.16 | 0.3 | 0.65 | 2
+    ) {
+        return await this.agent.createOrcaSingleSidedWhirlpool(
+            depositTokenAmount,
+            new PublicKey(tokenA),
+            new PublicKey(tokenB),
+            initialPrice,
+            maxPrice,
             feeTier
-        });
+        );
     }
 } 
