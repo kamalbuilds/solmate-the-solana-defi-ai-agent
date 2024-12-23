@@ -1,4 +1,4 @@
-# 🤖 SolMate : Your Reliable Friend in your Defi Journey on Solana
+# 🤖 SolMate : Your Reliable AI Companion in your Defi Journey on Solana
 
 > A Dapp Where Multiple specialized autonomous AI agents with powerful tools work together to analyze, recommend, and execute optimal DeFi strategies while maintaining user-defined risk parameters and portfolio goals powered by Solana Agent Kit & Langchain.
 
