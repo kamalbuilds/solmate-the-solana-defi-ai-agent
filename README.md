@@ -1,19 +1,19 @@
 # 🤖 SolMate : Your Reliable Friend in your Defi Journey on Solana
 
-> Where Multiple specialized autonomous AI agents with powerful tools work together to analyze, recommend, and execute optimal DeFi strategies while maintaining user-defined risk parameters and portfolio goals powered by Solana Agent Kit & Langchain.
+> A Dapp Where Multiple specialized autonomous AI agents with powerful tools work together to analyze, recommend, and execute optimal DeFi strategies while maintaining user-defined risk parameters and portfolio goals powered by Solana Agent Kit & Langchain.
 
 ## 🎯 Problem Statement
-Managing DeFi portfolios across multiple protocols on Avalanche can be complex and time-consuming. 
+Managing DeFi portfolios across multiple protocols on Solana can be complex and time-consuming. 
 
 Users need to:
-- Monitor multiple positions across different protocols
+- Monitor multiple positions across Solana DeFi protocols
 - Execute complex multi-step transactions
-- Stay updated with the latest crosschain yield opportunities
+- Stay updated with the latest yield opportunities
 - Maintain desired portfolio allocations
 - React quickly to market changes
 
 ## 💡 Solution
-An autonomous AI agent that manages your Avalanche DeFi portfolio by:
+An autonomous AI agent system that manages your Solana DeFi portfolio by:
 - Understanding high-level goals in natural language
 - Breaking down complex operations into executable steps
 - Automatically executing transactions when needed
@@ -46,22 +46,6 @@ An autonomous AI agent that manages your Avalanche DeFi portfolio by:
 - Performance metrics
 
 
-This integration enables:
-
-- Workflow Orchestration: Agents can now trigger and monitor complex multi-step operations through Kestra workflows.
-- Error Handling: Built-in retry mechanisms and error handling through Kestra's execution engine
-- Monitoring: Track execution status and progress of complex operations
-- Scalability: Leverage Kestra's distributed execution capabilities for resource-intensive tasks.
-
-The agents can now handle complex operations like portfolio rebalancing by:
-
-- Breaking down operations into discrete tasks
-- Executing them in the correct order
-- Handling failures and retries
-- Providing real-time status updates
-
-This makes the agents more robust and capable of handling complex DeFi operations in a reliable, monitored way.
-
 ## 🏗 Architecture
 
 
@@ -90,164 +74,64 @@ I'll update the Example Use Cases section in the README.md based on the example 
 
 ### 1. Portfolio Optimization
 ```text
-User: "I have 10 AVAX and want to optimize my portfolio between lending, liquidity provision, and trading. What's the best strategy right now?"
+User: "I have 100 SOL and want to optimize my yield across Solana DeFi protocols. What's the best strategy?"
 
 Agent Collaboration Flow:
-1. Portfolio Manager analyzes request and current market conditions
-2. DeFi Analytics Agent provides real-time data:
-   - Aave AVAX lending APY: 1.77%
-   - Uniswap AVAX-USDC pool APR: 43.893%
-   - Curve Blizz pool APY: 1.58%
-   - DeFi TVL trend: +5% weekly
-3. Trading Agent evaluates market opportunities
-4. Liquidity Agent assesses pool stability
-5. Portfolio Manager provides final allocation strategy
+1. Portfolio Manager analyzes request
+2. DeFi Analytics Agent provides data:
+   - Marinade Finance stSOL APY: 6.8%
+   - Solend USDC lending APY: 12.4%
+   - Orca ORCA-SOL pool APR: 24.5%
+   - Raydium RAY-SOL pool APR: 28.2%
+3. Staking Agent suggests liquid staking via Marinade
+4. Lending Agent analyzes Solend opportunities
+5. Liquidity Agent evaluates Orca pools
+
+Final Recommendation:
+- 40 SOL → Marinade Finance (stSOL)
+- Use stSOL as collateral on Solend
+- 30 SOL → Orca stSOL-SOL concentrated liquidity pool
+- 30 SOL → Split between Raydium RAY-SOL and ORCA-SOL pools
 ```
 
-### 2. Risk-Managed Yield Farming
+### 2. Arbitrage Opportunities
 ```text
-User: "Find me the highest yield opportunities while maintaining moderate risk levels"
+User: "Find the best arbitrage opportunities between Jupiter and Orca for SOL-USDC pairs"
 
 Agent Collaboration Flow:
-1. Portfolio Manager evaluates risk parameters
-2. DeFi Analytics Agent scans protocols:
-   - Protocol TVL analysis
-   - Smart contract audit status
-   - Historical yield stability
-3. Risk Assessment Agent performs:
-   - Protocol risk scoring
-   - Impermanent loss calculation
-   - Market volatility analysis
-4. Final recommendation with risk-adjusted returns
+1. Trading Agent analyzes price disparities
+2. DeFi Analytics provides market data:
+   - Jupiter best SOL/USDC: $101.25
+   - Orca SOL/USDC CL pool: $101.45
+   - 24h volume: $24.5M
+   - Liquidity depth: 45,000 SOL
+3. Research Agent analyzes historical spreads
+4. Portfolio Manager recommends execution strategy
+
+Opportunity Detected:
+- Buy 10 SOL on Jupiter at $101.25
+- Sell on Orca CL pool at $101.45
+- Potential profit: 0.2% (minus fees)
 ```
 
-### 3. Multi-Protocol Optimization
+### 3. Safe Yield Strategy
 ```text
-User: "Distribute 5000 USDC across lending platforms for the best risk-adjusted returns"
+User: "What's the safest way to earn yield on 1000 USDC on Solana?"
 
 Agent Collaboration Flow:
-1. DeFi Analytics Agent scans lending markets:
-   - Protocol-specific APYs
-   - Total deposits
-   - Utilization rates
-2. Risk Agent evaluates:
-   - Protocol security
-   - Market conditions
-   - Collateral factors
-3. Portfolio Manager executes:
-   - Optimal distribution
-   - Position monitoring
-   - Auto-rebalancing setup
-```
+1. Portfolio Manager prioritizes security
+2. DeFi Analytics provides stable yields:
+   - Solend Main Pool USDC: 5.8% APY
+   - Mango Markets USDC: 6.2% APY
+   - UXD Protocol USDC: 4.9% APY
+3. Lending Agent analyzes protocol security
+4. Research Agent provides risk scores
 
-### 4. Smart Rebalancing
-```text
-User: "Monitor and rebalance my portfolio to maintain 40% AVAX, 30% ETH, 30% stables"
-
-Agent Collaboration Flow:
-1. Portfolio Manager tracks allocations
-2. Trading Agent monitors:
-   - Price movements
-   - Trading volumes
-   - Market depth
-3. DeFi Analytics provides:
-   - Gas optimization data
-   - Slippage estimates
-   - Best execution routes
-4. Automated rebalancing when:
-   - Deviation exceeds 5%
-   - Gas costs are optimal
-   - Market conditions favorable
-
-
-### 5. Yield Optimization
-```text
-User: "Optimize my volatile yields while maintaining 50% SOL and 50% USDT split"
-
-Agent will:
-1. Analyze current positions
-2. Scout highest yield opportunities
-3. Execute necessary swaps
-4. Deploy to optimal protocols
-5. Monitor and rebalance as needed
-```
-
-### 6. Portfolio Rebalancing
-```text
-User: "Rebalance my portfolio to 30% SOL, 30% JUP, and 40% stables"
-
-Agent will:
-1. Calculate required trades
-2. Find optimal execution paths
-3. Execute trades in optimal order
-4. Confirm final allocations
-5. Report completion
-```
-
-### 7. Cross-Chain Management
-```text
-User: "Bridge 1000 USDC from Ethereum to Solana and deploy to highest yield"
-
-Agent will:
-1. Initiate bridge transaction
-2. Monitor bridge status
-3. Receive funds on Avalanche
-4. Research yield opportunities
-5. Deploy to best protocol generating highest yield
-```
-
-Key enhancements:
-- Added support for yield/APY data:
-  - Get current yields across all pools
-  - Track historical yield performance
-  - Filter by chain, protocol, or asset type
-- Added DEX volume tracking:
-  - Monitor daily and total volumes
-  - Break down by chain and protocol
-  - Track historical volume trends
-- Added token pricing capabilities:
-  - Get current prices for any token
-  - Track historical price data
-  - Support for multiple chains
-- Added stablecoin analytics:
-  - Monitor stablecoin market caps
-  - Track peg stability
-  - Analyze distribution across chains
-- Enhanced TVL tracking:
-  - Historical TVL data
-  - Chain and protocol breakdowns
-  - Token composition analysis
-
-## 🚀 Getting Started
-
-1. Clone the repository
-```bash
-git clone https://github.com/kamalbuilds/solmate-defi-ai-agent
-```
-
-2. Install dependencies
-```bash
-cd frontend
-npm install
-```
-
-3. Set up environment variables
-```env
-NEXT_PUBLIC_BRIAN_API_KEY=your_brian_api_key
-NEXT_PUBLIC_PRIVATE_KEY=your_private_key
-NEXT_PUBLIC_OPENAI_API_KEY=your_openai_api_key
-```
-
-4. Run the development server
-```bash
-npm run dev
-```
-
-## 📄 License
-MIT
-
-## 🤝 Contributing
-Contributions are welcome! Please read our contributing guidelines before submitting PRs.
+Recommendation:
+- 700 USDC to Solend Main Pool (5.8% APY)
+- 300 USDC to Mango Markets (6.2% APY)
+- Estimated blended APY: 5.9%
+- Risk Level: Low
 ```
 ## ⭐ Key Features
 
@@ -303,21 +187,6 @@ graph TD
     end
 ```
 
-## 🛠️ Built With
-
-- **Frontend**: Next.js, TypeScript, TailwindCSS
-- **AI/ML**: Brian AI, LangChain, GPT-4
-- **Blockchain**: Avalanche Network, TraderJoe DEX
-- **Development**: Node.js, Ethers.js
-
-## 📋 Prerequisites
-
-```bash
-# Required environment variables
-NEXT_PUBLIC_BRIAN_API_KEY=your_brian_api_key
-NEXT_PUBLIC_PRIVATE_KEY=your_private_key
-NEXT_PUBLIC_OPENAI_API_KEY=your_openai_api_key
-```
 
 ## 💡 Example Use Cases
 
@@ -392,7 +261,7 @@ interface AssisterResponse {
    - Risk assessment
    - Data Sources: DeFi Llama, Token Terminal
 
-3. **Liquidity Agent**
+3. **Liquidity Management Agent**
    - Launch tokens
    - Manage liquidity pools
    - Stake-to-earn strategies
@@ -451,4 +320,21 @@ sequenceDiagram
     Tools->>SpecializedAgent: Process Results
     SpecializedAgent->>Frontend: Return Response
     Frontend->>User: Display Results
+```
+
+
+## 🛠️ Built With
+
+- **Frontend**: Next.js, TypeScript, TailwindCSS
+- **AI/ML**: Brian AI, LangChain, GPT-4
+- **Blockchain**: Avalanche Network, TraderJoe DEX
+- **Development**: Node.js, Ethers.js
+
+## 📋 Prerequisites
+
+```bash
+# Required environment variables
+NEXT_PUBLIC_BRIAN_API_KEY=your_brian_api_key
+NEXT_PUBLIC_PRIVATE_KEY=your_private_key
+NEXT_PUBLIC_OPENAI_API_KEY=your_openai_api_key
 ```
