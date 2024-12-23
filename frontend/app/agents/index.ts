@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import {
     type BrianAgentOptions,
     BrianToolkit,
@@ -13,10 +13,12 @@ import { ChatMessageHistory } from "langchain/memory";
 import { DynamicStructuredTool } from "langchain/tools";
 import { z } from "zod";
 import { FunctorService } from '../services/functorService';
-import { createSolanaTools, SolanaAgentKit } from "solana-agent-kit";
+import { KestraService } from '../services/kestraService';
+import { SolanaAgentKit } from "solana-agent-kit";
 import { PublicKey } from "@solana/web3.js";
 import { SolanaAssistant } from "@/lib/agents/research-agent";
-
+// Initialize Kestra service
+const kestraService = new KestraService();
 
 // Message history store
 const store: Record<string, ChatMessageHistory> = {};
@@ -28,13 +30,6 @@ function getMessageHistory(sessionId: string) {
     return store[sessionId];
 }
 
-const solanaAgent = new SolanaAgentKit(
-    process.env["NEXT_PUBLIC_SOLANA_PRIVATE_KEY"] as string,
-    process.env["NEXT_PUBLIC_SOLANA_RPC_URL"] as string,
-    process.env["NEXT_PUBLIC_OPENAI_API_KEY"] as string
-);
-
-const solanaTools = createSolanaTools(solanaAgent);
 // DeFiLlama Tools Definition
 const defiLlamaToolkit = {
     getTVLTool: new DynamicStructuredTool({
@@ -132,66 +127,66 @@ const coingeckoTool = new DynamicStructuredTool({
 
 
 // Add Solana tools
-// const solanaTools = {
-//     lendingTool: new DynamicStructuredTool({
-//         name: "solana_lend_assets",
-//         description: "Lend assets on Solana protocols like Meteora",
-//         schema: z.object({
-//             assetMint: z.string().describe("Token mint address"),
-//             amount: z.number().describe("Amount to lend"),
-//             protocol: z.enum(["meteora", "solend"]).describe("Lending protocol to use")
-//         }),
-//         func: async ({ assetMint, amount, protocol }) => {
-//             const solanaAgent = new SolanaAgentKit(
-//                 process.env["NEXT_PUBLIC_SOLANA_PRIVATE_KEY"] as string,
-//                 process.env["NEXT_PUBLIC_SOLANA_RPC_URL"] as string,
-//                 process.env["NEXT_PUBLIC_OPENAI_API_KEY"] as string
-//             );
-//             return await solanaAgent.lendAssets(new PublicKey(assetMint), amount);
-//         }
-//     }),
+const solanaTools = {
+    lendingTool: new DynamicStructuredTool({
+        name: "solana_lend_assets",
+        description: "Lend assets on Solana protocols like Meteora",
+        schema: z.object({
+            assetMint: z.string().describe("Token mint address"),
+            amount: z.number().describe("Amount to lend"),
+            protocol: z.enum(["meteora", "solend"]).describe("Lending protocol to use")
+        }),
+        func: async ({ assetMint, amount, protocol }) => {
+            const solanaAgent = new SolanaAgentKit(
+                process.env["NEXT_PUBLIC_SOLANA_PRIVATE_KEY"] as string,
+                process.env["NEXT_PUBLIC_SOLANA_RPC_URL"] as string,
+                process.env["NEXT_PUBLIC_OPENAI_API_KEY"] as string
+            );
+            return await solanaAgent.lendAssets(new PublicKey(assetMint), amount);
+        }
+    }),
 
-//     tradingTool: new DynamicStructuredTool({
-//         name: "solana_trade_tokens",
-//         description: "Execute token swaps on Jupiter Exchange",
-//         schema: z.object({
-//             outputMint: z.string().describe("Output token mint address"),
-//             inputAmount: z.number().describe("Input amount"),
-//             inputMint: z.string().optional().describe("Input token mint address"),
-//             slippageBps: z.number().optional().describe("Slippage in basis points")
-//         }),
+    tradingTool: new DynamicStructuredTool({
+        name: "solana_trade_tokens",
+        description: "Execute token swaps on Jupiter Exchange",
+        schema: z.object({
+            outputMint: z.string().describe("Output token mint address"),
+            inputAmount: z.number().describe("Input amount"),
+            inputMint: z.string().optional().describe("Input token mint address"),
+            slippageBps: z.number().optional().describe("Slippage in basis points")
+        }),
 
-//         func: async ({ outputMint, inputAmount, inputMint, slippageBps }) => {
-//             const solanaAgent = new SolanaAgentKit(
-//                 process.env["NEXT_PUBLIC_SOLANA_PRIVATE_KEY"] as string,
-//                 process.env["NEXT_PUBLIC_SOLANA_RPC_URL"] as string,
-//                 process.env["NEXT_PUBLIC_OPENAI_API_KEY"] as string
-//             );
-//             return await solanaAgent.trade(
-//                 new PublicKey(outputMint),
-//                 inputAmount,
-//                 inputMint ? new PublicKey(inputMint) : undefined,
-//                 slippageBps
-//             );
-//         }
-//     }),
+        func: async ({ outputMint, inputAmount, inputMint, slippageBps }) => {
+            const solanaAgent = new SolanaAgentKit(
+                process.env["NEXT_PUBLIC_SOLANA_PRIVATE_KEY"] as string,
+                process.env["NEXT_PUBLIC_SOLANA_RPC_URL"] as string,
+                process.env["NEXT_PUBLIC_OPENAI_API_KEY"] as string
+            );
+            return await solanaAgent.trade(
+                new PublicKey(outputMint),
+                inputAmount,
+                inputMint ? new PublicKey(inputMint) : undefined,
+                slippageBps
+            );
+        }
+    }),
 
-//     stakingTool: new DynamicStructuredTool({
-//         name: "solana_stake",
-//         description: "Stake SOL tokens",
-//         schema: z.object({
-//             amount: z.number().describe("Amount of SOL to stake")
-//         }),
-//         func: async ({ amount }) => {
-//             const solanaAgent = new SolanaAgentKit(
-//                 process.env["NEXT_PUBLIC_SOLANA_PRIVATE_KEY"] as string,
-//                 process.env["NEXT_PUBLIC_SOLANA_RPC_URL"] as string,
-//                 process.env["NEXT_PUBLIC_OPENAI_API_KEY"] as string
-//             );
-//             return await solanaAgent.stake(amount);
-//         }
-//     })
-// };
+    stakingTool: new DynamicStructuredTool({
+        name: "solana_stake",
+        description: "Stake SOL tokens",
+        schema: z.object({
+            amount: z.number().describe("Amount of SOL to stake")
+        }),
+        func: async ({ amount }) => {
+            const solanaAgent = new SolanaAgentKit(
+                process.env["NEXT_PUBLIC_SOLANA_PRIVATE_KEY"] as string,
+                process.env["NEXT_PUBLIC_SOLANA_RPC_URL"] as string,
+                process.env["NEXT_PUBLIC_OPENAI_API_KEY"] as string
+            );
+            return await solanaAgent.stake(amount);
+        }
+    })
+};
 
 export interface Agent {
     id: string;
@@ -204,18 +199,6 @@ export interface Agent {
     agent: RunnableWithMessageHistory<Record<string, any>, any>;
     avatar: string;
 }
-
-const createSpecializedSolanaAgent = (tools: any[], systemPrompt: string) => {
-    return createToolCallingAgent({
-        llm: new ChatOpenAI({ 
-            modelName: "gpt-4-turbo-preview",
-            temperature: 0.7,
-            streaming: true
-        }),
-        tools: tools,
-        prompt: systemPrompt
-    });
-};
 
 export const createSpecializedAgents = async (baseOptions: BrianAgentOptions): Promise<Agent[]> => {
     // Trading Agent
@@ -240,7 +223,15 @@ export const createSpecializedAgents = async (baseOptions: BrianAgentOptions): P
         instructions: "You are a DeFi research specialist. Provide in-depth analysis of protocols, markets, and trends.",
     });
 
-    
+    // Liquidity Agent
+    const liquidityAgent = await createAgent({
+        ...baseOptions,
+        tools: [
+            solanaTools.lendingTool,
+            defiLlamaToolkit.getYieldsTool
+        ],
+        instructions: "You are a liquidity management specialist. Help users manage liquidity pools and optimize yield strategies.",
+    });
 
     // Portfolio Agent
     const portfolioAgent = await createAgent({
@@ -284,7 +275,11 @@ export const createSpecializedAgents = async (baseOptions: BrianAgentOptions): P
         instructions: "You are a lending specialist on Solana. Help users find and execute lending opportunities.",
     });
 
-
+    const solanaStakingAgent = await createAgent({
+        ...baseOptions,
+        tools: [solanaTools.stakingTool, defiLlamaToolkit.getTVLTool],
+        instructions: "You are a staking specialist on Solana. Help users find and execute staking opportunities.",
+    });
 
 
     return [
@@ -296,14 +291,7 @@ export const createSpecializedAgents = async (baseOptions: BrianAgentOptions): P
             description: "Specialized in analyzing market conditions and executing optimal trading strategies",
             capabilities: ["Perp trading", "Take profit/Stop loss", "Position sizing"],
             protocols: ["Jupiter", "Mango Markets"],
-            agent: createSpecializedSolanaAgent(
-                [
-                    solanaTools.find(t => t.name === "solana_trade"),
-                    solanaTools.find(t => t.name === "solana_balance"),
-                    solanaTools.find(t => t.name === "solana_fetch_price")
-                ],
-                "You are an expert DeFi trading agent on Solana. You help users execute trades, analyze market conditions, and implement trading strategies using Jupiter Exchange."
-            ),
+            agent: tradingAgent,
             avatar: "/agent_trader.png"
         },
         {
@@ -315,25 +303,18 @@ export const createSpecializedAgents = async (baseOptions: BrianAgentOptions): P
             capabilities: ["Market analysis", "Protocol research", "Risk assessment"],
             protocols: ["DeFi Llama", "Token Terminal"],
             agent: researchAgent,
-            avatar: "/staking-agent.png"
+            avatar: "/research-agent.png"
         },
         {
             id: "liquidity",
-            name: "Liquidity Management Agent",
+            name: "Liquidity Agent",
             type: "liquidity",
             status: "active",
             description: "Expert in managing liquidity pools and optimizing yield strategies on solana",
             capabilities: ["Launch tokens", "Manage liquidity", "Stake-to-earn"],
             protocols: ["Orca", "Raydium"],
-            agent: createSpecializedSolanaAgent(
-                [
-                    solanaTools.find(t => t.name === "solana_deploy_token"),
-                    solanaTools.find(t => t.name === "solana_raydium_create_cpmm"),
-                    solanaTools.find(t => t.name === "solana_create_single_sided_whirlpool")
-                ],
-                "You are a liquidity management specialist on Solana. You help users deploy tokens, create liquidity pools, and optimize yield farming strategies."
-            ),
-            avatar: "/agent_liquidity.png"
+            agent: liquidityAgent,
+            avatar: "/liquidity-agent.png"
         },
         {
             id: "portfolio",
@@ -376,13 +357,7 @@ export const createSpecializedAgents = async (baseOptions: BrianAgentOptions): P
             description: "Handles Solana staking operations and maximizes staking yields",
             capabilities: ["Stake SOL", "Monitor rewards", "Auto-compound"],
             protocols: ["Marinade", "Lido"],
-            agent: createSpecializedSolanaAgent(
-                [
-                    solanaTools.find(t => t.name === "solana_stake"),
-                    solanaTools.find(t => t.name === "solana_balance")
-                ],
-                "You are a Solana staking specialist. You help users stake their SOL tokens and manage staking positions for optimal yields."
-            ),
+            agent: solanaStakingAgent,
             avatar: "/staking-agent.png"
         },
         {
@@ -394,7 +369,7 @@ export const createSpecializedAgents = async (baseOptions: BrianAgentOptions): P
             capabilities: ["Chain analysis", "Transaction help", "Protocol guidance"],
             protocols: ["Solana"],
             agent: SolanaAssistant,
-            avatar: "/solana-agent.png"
+            avatar: "/solana-assistant.png"
         }
     ];
 };
@@ -418,7 +393,7 @@ const createAgent = async ({
     });
 
     const prompt = ChatPromptTemplate.fromMessages([
-        ["system", instructions],
+        ["system", instructions!],
         ["placeholder", "{chat_history}"],
         ["human", "{input}"],
         ["placeholder", "{agent_scratchpad}"],

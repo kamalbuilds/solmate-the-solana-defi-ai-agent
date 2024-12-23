@@ -88,8 +88,8 @@ export default function AgentsPage() {
                     response = await researchAgent.research(input);
                     break;
                 default:
-                    response = "The Defi Action was executed successfully 🍀";
-                // response = `${selectedAgent.name} is not yet implemented`;
+                    // response = "The Defi Action was executed successfully 🍀";
+                response = `${selectedAgent.name} is not yet implemented`;
             }
 
             setMessages(prev => [...prev, {
