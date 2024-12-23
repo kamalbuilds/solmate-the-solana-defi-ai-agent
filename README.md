@@ -2,9 +2,6 @@
 
 > Where Multiple specialized autonomous AI agents with powerful tools work together to analyze, recommend, and execute optimal DeFi strategies while maintaining user-defined risk parameters and portfolio goals powered by Solana Agent Kit & Langchain.
 
-- risk parameters and portfolio balance
-- Provides real-time feedback and execution status
-
 ## 🎯 Problem Statement
 Managing DeFi portfolios across multiple protocols on Avalanche can be complex and time-consuming. 
 
@@ -48,11 +45,6 @@ An autonomous AI agent that manages your Avalanche DeFi portfolio by:
 - Transaction confirmations
 - Performance metrics
 
-### 5. Kestra Orchestration
-- Execute and monitor complex workflows
-- Orchestrate multi-step operations
-- Integrate with external APIs
-- Handle errors and retries
 
 This integration enables:
 
@@ -73,107 +65,6 @@ This makes the agents more robust and capable of handling complex DeFi operation
 ## 🏗 Architecture
 
 
-
-## 🔗 AVS & Subgraph Integration
-
-### Eigenlayer AVS Integration
-
-The portfolio manager integrates with Eigenlayer's Actively Validated Service (AVS) to provide decentralized portfolio validation:
-
-#### Components:
-
-1. **PortfolioValidationServiceManager**
-   - Manages portfolio validation tasks
-   - Handles operator registrations and responses
-   - Validates operator signatures
-   - Maintains token registry and eligibility data
-
-2. **PortfolioTask**
-   - Defines portfolio validation task structure
-   - Tracks task status and responses
-   - Supports multiple validation strategies:
-     - TokenEligibility
-     - PortfolioBalance
-     - RiskAssessment
-
-#### Deployment & Setup:
-
-- **PortfolioDeployer**
-  - Deploys and initializes AVS contracts
-  - Sets up stake registry
-  - Configures operator quorum
-  - Manages token strategy deployment
-
-- **Deployment Library**
-  - Handles proxy deployment
-  - Manages contract upgrades
-  - Stores deployment configurations
-
-### Subgraph Integration
-
-The subgraph indexes and tracks portfolio validation events and data:
-
-#### Schema:
-
-```graphql
-type Portfolio @entity {
-  id: Bytes!
-  taskId: BigInt!
-  tokens: [Token!]!
-  amounts: [BigInt!]!
-  strategy: String!
-  validationType: Int!
-  status: Int!
-  createdAt: BigInt!
-  validations: [Validation!]!
-}
-
-type Token @entity {
-  id: Bytes!
-  chain: String!
-  address: Bytes!
-  isEligible: Boolean!
-  metadata: String
-  createdBlock: BigInt!
-  portfolios: [Portfolio!]!
-}
-
-type Validation @entity {
-  id: Bytes!
-  portfolio: Portfolio!
-  operator: Bytes!
-  validation: Bytes!
-  timestamp: BigInt!
-}
-```
-
-#### Event Handlers:
-
-- **NewPortfolioTask**: Indexes new portfolio validation requests
-- **ValidationSubmitted**: Tracks operator validations
-- **TokenDataUpdated**: Monitors token eligibility updates
-
-### Integration Flow
-
-1. **Portfolio Creation**
-   - User submits portfolio through SolMate
-   - AVS creates validation task
-   - Event emitted and indexed by subgraph
-
-2. **Validation Process**
-   - Operators submit validations
-   - AVS verifies signatures
-   - Subgraph indexes validation responses
-
-3. **Data Analysis**
-   - SolMate queries subgraph for validation data
-   - AI analyzes validation responses
-   - Generates recommendations based on consensus
-
-4. **Token Management**
-   - AVS maintains token registry
-   - Updates token eligibility
-   - Subgraph provides token analytics
 
 ### Benefits
 
@@ -465,3 +356,99 @@ Agent will:
 2. Calculate optimal entry points
 3. Identify assets to swap
 4. Execute Defi Actions
+
+```
+
+## 🤖 Agent Architecture
+
+### Assister Integration
+The platform leverages the Assister service for enhanced agent capabilities:
+
+```typescript
+// Agent Communication Layer
+interface AssisterResponse {
+    message: string;
+    message_at: string;
+    is_user: boolean;
+}
+
+// Core Agent Services
+- Session Management
+- Real-time Chat Processing
+- Context-Aware Responses
+```
+
+### Specialized Agents
+
+1. **Trading Agent**
+   - Perp trading execution
+   - Take profit/Stop loss management
+   - Position sizing optimization
+   - Protocols: Jupiter, Mango Markets
+
+2. **Research Agent**
+   - Market analysis
+   - Protocol research
+   - Risk assessment
+   - Data Sources: DeFi Llama, Token Terminal
+
+3. **Liquidity Agent**
+   - Launch tokens
+   - Manage liquidity pools
+   - Stake-to-earn strategies
+   - Protocols: Orca, Raydium
+
+4. **Portfolio Manager**
+   - Portfolio optimization
+   - Risk management
+   - Asset allocation
+   - Cross-protocol management
+
+5. **DeFi Analytics Agent**
+   - TVL tracking
+   - Yield analysis
+   - Protocol comparison
+   - Powered by DeFi Llama data
+
+6. **Lending Agent**
+   - Lend assets
+   - Monitor positions
+   - Auto-rebalance
+   - Protocols: Meteora, Solend
+
+7. **Staking Agent**
+   - Stake SOL
+   - Monitor rewards
+   - Auto-compound
+   - Protocols: Marinade, Lido
+
+8. **Solana Assistant**
+   - Chain analysis
+   - Transaction help
+   - Protocol guidance
+   - General Solana support
+
+### Agent Tools & Capabilities
+
+```typescript
+// Core Tools
+- Coingecko Price Data
+- DeFi Llama Analytics
+- Solana Network Tools
+- Trading Execution
+- Yield Analysis
+```
+
+### Communication Flow
+```mermaid
+sequenceDiagram
+    User->>Frontend: Natural Language Query
+    Frontend->>AssisterService: Process Query
+    AssisterService->>SpecializedAgent: Route to Appropriate Agent
+    SpecializedAgent->>Tools: Execute Required Actions
+    Tools->>Blockchain: Perform Operations
+    Blockchain->>Tools: Return Results
+    Tools->>SpecializedAgent: Process Results
+    SpecializedAgent->>Frontend: Return Response
+    Frontend->>User: Display Results
+```
