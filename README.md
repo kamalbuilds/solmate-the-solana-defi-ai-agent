@@ -20,6 +20,10 @@ An autonomous AI agent system that manages your Solana DeFi portfolio by:
 - Providing real-time updates and progress tracking
 - Maintaining portfolio balance according to user preferences
 
+## 🏗 Architecture
+
+<img width="1144" alt="image" src="https://github.com/user-attachments/assets/d8bec8b2-8554-41da-a286-7232228c67b8" />
+
 ## 🌟 Key Features
 
 ### 1. Natural Language Interface
@@ -44,10 +48,6 @@ An autonomous AI agent system that manages your Solana DeFi portfolio by:
 - Progress tracking
 - Transaction confirmations
 - Performance metrics
-
-
-## 🏗 Architecture
-
 
 
 ### Benefits
@@ -155,37 +155,6 @@ Recommendation:
 - Transaction confirmations
 - Performance metrics
 - Risk alerts
-
-## 🏗️ Architecture
-
-```mermaid
-graph TD
-    A[User Interface] --> B[Next.js Frontend]
-    B --> C[Brian AI Agent]
-    C --> D[LangChain]
-    D --> E[OpenAI GPT-4]
-    C --> F[Brian Toolkit]
-    F --> G[Avalanche Network]
-    
-    subgraph "Core Components"
-        C
-        D
-        E
-        F
-    end
-    
-    subgraph "Blockchain Layer"
-        G --> H[TraderJoe]
-        G --> I[Other DEXs]
-        G --> J[Lending Protocols]
-    end
-    
-    subgraph "Monitoring"
-        C --> K[Status Updates]
-        C --> L[Progress Tracking]
-        C --> M[Transaction History]
-    end
-```
 
 
 ## 💡 Example Use Cases
