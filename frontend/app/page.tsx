@@ -40,6 +40,9 @@ interface Agent {
   status: string;
   message?: string;
   agent?: any;
+  description?: string;
+  capabilities?: string[];
+  protocols?: string[];
 }
 
 // Add this interface for agent collaboration messages
@@ -148,11 +151,15 @@ const EXAMPLE_RESPONSES = {
 
 // Add a mapping for agent images
 const agentImages = {
-  'trading': '/agent_trader.png',
-  'liquidity': '/agent_liquidity.png',  // You can add different images for each agent
-  'portfolio': '/agent_default.png',
-  'defi-analytics': '/agent_analyst.png'
-};
+  trading: '/agent_trader.png',
+  research: '/agent_researcher.png',
+  liquidity: '/agent_liquidity.png',
+  portfolio: '/agent_analyst.png',
+  'defi-analytics': '/agent_default.png',
+  lending: '/agent_analyst.png',
+  staking: '/agent_researcher.png',
+  'solana-assistant': '/agent_default.png'
+} as const;
 
 export default function Home() {
   const [messages, setMessages] = useState<CollaborationMessage[]>([]);
@@ -381,36 +388,42 @@ export default function Home() {
       {/* Left Sidebar - Agent Details */}
       <div className="w-1/4 border-r border-gray-200 p-4 overflow-y-auto">
         <h2 className="text-lg font-semibold mb-4">Available Agents</h2>
-        {agents.map((agent) => (
-          <div
-            key={agent.id}
-            className={`p-4 mb-4 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${agentState.activeAgent === agent.id ? 'bg-blue-50 border border-blue-200' : 'bg-white border'
-              }`}
-          >
-            <div className="flex items-center mb-2">
-              <div className="relative w-12 h-12 mr-3">
-                <Image
-                  src={agentImages[agent.id as keyof typeof agentImages]}
-                  alt={agent.name}
-                  fill
-                  className="rounded-full object-cover"
-                  priority
-                />
+        {agents.map((agent) => {
+          // Get the image source with a fallback
+          const imageSrc = agentImages[agent.id as keyof typeof agentImages] || '/agent_default.png';
+
+          return (
+            <div
+              key={agent.id}
+              className={`p-4 mb-4 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${agentState.activeAgent === agent.id ? 'bg-blue-50 border border-blue-200' : 'bg-white border'
+                }`}
+            >
+              <div className="flex items-center mb-2">
+                <div className="relative w-12 h-12 mr-3">
+                  <Image
+                    src={imageSrc}
+                    alt={agent.name}
+                    width={48}
+                    height={48}
+                    className="rounded-full object-cover"
+                    priority
+                  />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900">{agent.name}</h3>
+                  <p className="text-xs text-gray-500">AI Assistant</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-medium text-gray-900">{agent.name}</h3>
-                <p className="text-xs text-gray-500">AI Assistant</p>
-              </div>
+              <p className="text-sm text-gray-600 mt-2">{agent.description}</p>
+              {agentState.activeAgent === agent.id && (
+                <div className="mt-2 text-xs text-blue-600 flex items-center">
+                  <span className="w-2 h-2 bg-blue-600 rounded-full mr-2 animate-pulse"></span>
+                  Active
+                </div>
+              )}
             </div>
-            <p className="text-sm text-gray-600 mt-2">{agent.description}</p>
-            {agentState.activeAgent === agent.id && (
-              <div className="mt-2 text-xs text-blue-600 flex items-center">
-                <span className="w-2 h-2 bg-blue-600 rounded-full mr-2 animate-pulse"></span>
-                Active
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Center - Chat Interface */}

@@ -3,10 +3,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { WalletIcon, ChartBarIcon, CogIcon } from "@heroicons/react/24/outline";
-import { ConnectButton, lightTheme } from "thirdweb/react";
-import { client } from "@/app/client";
-import { avalanche, avalancheFuji, ethereum, modeTestnet, bsc, base } from "thirdweb/chains";
-import OktoConnect from "./OktoConnect";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 const navItems = [
@@ -77,22 +73,6 @@ export function Navbar() {
 
           <div className="flex items-center space-x-4">
             <WalletMultiButton style={{ fontSize: '0.75rem !important', height: '2.5rem !important' }} />
-            {/* <ConnectButton
-              client={client}
-              theme={lightTheme()}
-              chains={[avalancheFuji, avalanche, modeTestnet, ethereum, bsc, base]}
-              connectButton={{
-                style: {
-                  fontSize: '0.75rem !important',
-                  height: '2.5rem !important',
-                },
-                label: 'Sign In',
-              }}
-            // accountAbstraction={{
-            //   chain: avalancheFuji,
-            //   sponsorGas: true,
-            // }}
-            /> */}
           </div>
         </div>
       </div>

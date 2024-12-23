@@ -4,87 +4,25 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function Footer() {
-  const pathname = usePathname();
-  const [currentYear, setCurrentYear] = useState(2024);
+interface FooterProps {
+  className?: string;
+}
 
-  useEffect(() => {
-    setCurrentYear(new Date().getFullYear());
-  }, []);
-
-  // Hide footer on deck page
-  if (pathname === "/deck") return null;
-
-  const sections = {
-    main: [
-      { label: "Blog", href: "https://solmate-defi-ai-agent.vercel.app/blog" },
-      { label: "Whitepaper", href: "https://solmate-defi-ai-agent.vercel.app/whitepaper" },
-    ],
-    legal: [
-      { label: "Terms of Service", href: "https://solmate-defi-ai-agent.vercel.app/terms" },
-      { label: "Privacy Policy", href: "https://solmate-defi-ai-agent.vercel.app/privacy" },
-    ],
-    social: [
-      { label: "X (Twitter)", href: "https://x.com/0xkamal7" },
-      { label: "Telegram", href: "https://t.me/kamalthedev" },
-    ],
-  };
-
+export default function Footer({ className = '' }: FooterProps) {
   return (
-    <footer className="border-t border-white/10 w-full fixed bottom-0 overflow-hidden">
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-lg -z-10" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 relative">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          <div>
-            <h3 className="gradient-text font-semibold mb-4">Solmate the Defi AI Agents</h3>
-            <ul className="space-y-2">
-              {sections.main.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="nav-link">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="gradient-text font-semibold mb-4">Legal</h3>
-            <ul className="space-y-2">
-              {sections.legal.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="nav-link">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="gradient-text font-semibold mb-4">Connect</h3>
-            <ul className="space-y-2">
-              {sections.social.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="nav-link"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+    <footer className={`fixed bottom-0 left-0 right-0 bg-white border-t ${className}`}>
+      <div className="container mx-auto px-4 h-full flex items-center justify-between">
+        <div className="text-sm text-gray-600">
+          © 2024 Solmate. All rights reserved.
         </div>
 
-        <div className="border-t border-white/10 pt-8 text-center md:text-left">
-          <div className="text-white/60 text-sm">
-            © {currentYear} Solmate the DefiAI Agent. All rights reserved.
-          </div>
+        <div className="flex items-center space-x-4">
+          <a href="/privacy" className="text-sm text-gray-600 hover:text-gray-900">
+            Privacy Policy
+          </a>
+          <a href="/terms" className="text-sm text-gray-600 hover:text-gray-900">
+            Terms of Service
+          </a>
         </div>
       </div>
     </footer>

@@ -3,9 +3,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { MainLayout } from "@/components/layouts/MainLayout";
-import { ThirdwebProvider } from "thirdweb/react";
 import { QueryClient, QueryClientProvider } from 'react-query';
-import Provider from "./Provider";
 import AppWalletProvider from "@/components/AppWalletProvider";
 
 const inter = Inter({
@@ -29,11 +27,9 @@ export default function RootLayout({
         className={`${inter.className} bg-dark-navy min-h-screen antialiased`}
       >
         <QueryClientProvider client={queryClient}>
-          <Provider>
-            <AppWalletProvider>
-              <MainLayout>{children}</MainLayout>
-            </AppWalletProvider>
-          </Provider>
+          <AppWalletProvider>
+            <MainLayout>{children}</MainLayout>
+          </AppWalletProvider>
         </QueryClientProvider>
       </body>
     </html>
