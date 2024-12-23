@@ -10,7 +10,7 @@ import { ethers } from "ethers";
 import { BrianToolkit } from "@brian-ai/langchain";
 import { AvalancheConfig } from "@brian-ai/langchain/chains";
 import { initializeAgents } from "./agents";
-import { SendHorizontal, Bot, User } from "lucide-react";
+import { SendHorizontal, Bot, User, ChevronLeft, ChevronRight } from "lucide-react";
 import { AgentCharacters } from "./agents/AgentCharacters";
 import Image from 'next/image';
 
@@ -54,111 +54,162 @@ interface CollaborationMessage extends Message {
 
 // Add this near the top of the file with other constants
 const EXAMPLE_RESPONSES = {
-  "I have 10 AVAX and want to optimize my portfolio between lending, liquidity provision, and trading. What's the best strategy right now?": [
-    // Portfolio Manager Initial Analysis
+  "I have 100 SOL and want to optimize my yield across Solana DeFi protocols. What's the best strategy?": [
+    // Initial Analysis
     {
       role: "assistant",
-      content: "Analyzing your 10 AVAX portfolio allocation request. Given current market conditions, we should evaluate lending rates, LP opportunities, and trading pairs. Let me consult our specialized agents.",
+      content: "Analyzing optimal yield strategies for 100 SOL across Solana's DeFi ecosystem. Let me consult our specialized agents for a comprehensive analysis.",
       agentName: "Portfolio Manager",
       collaborationType: "analysis",
-      timestamp: "10:30 AM"
+      timestamp: new Date().toLocaleTimeString()
     },
-
     // DeFi Analytics Agent Response
     {
       role: "assistant",
-      content: "Current market analysis:\n- Aave AVAX lending APY: 1,77%\n- Uniswap AVAX-USDC pool APR: 43.893%\n- Curve Blizz pool APY: 1.58%\nTotal DeFi TVL trend is up 5% this week, suggesting growing stability.",
+      content: "Current protocol metrics:\n- Marinade Finance stSOL APY: 6.8%\n- Solend USDC lending APY: 12.4%\n- Orca ORCA-SOL pool APR: 24.5%\n- Raydium RAY-SOL pool APR: 28.2%",
       agentName: "DeFi Analytics",
-      collaborationType: "suggestion",
-      timestamp: "10:31 AM"
+      collaborationType: "data",
+      timestamp: new Date().toLocaleTimeString()
     },
-
-    // Liquidity Pool Agent Response
+    // Staking Agent Input
     {
       role: "assistant",
-      content: "Recommended LP allocation:\n1. AVAX-USDC Uniswap V3 (concentrated liquidity 1800-2200): 4 AVAX\n2. blizz Curve: 3 AVAX\nCurrent impermanent loss risk: Moderate",
-      agentName: "Liquidity Pool Agent",
+      content: "Liquid staking via Marinade offers the safest yield at 6.8% APY with instant liquidity through stSOL. This can be further utilized as collateral.",
+      agentName: "Staking Agent",
       collaborationType: "suggestion",
-      timestamp: "10:31 AM"
+      timestamp: new Date().toLocaleTimeString()
     },
-
-    // Trading Agent Response
+    // Lending Agent Analysis
     {
       role: "assistant",
-      content: "Market conditions favor keeping 3 AVAX in spot for potential swing trading. Key resistance at $2,200, support at $1,850. Set up limit orders at these levels.",
-      agentName: "Trading Agent",
+      content: "Solend's isolated lending pools show strong stability. Current optimal strategy: Supply stSOL as collateral to borrow USDC at 65% LTV, earning additional 5.2% on collateral.",
+      agentName: "Lending Agent",
       collaborationType: "suggestion",
-      timestamp: "10:32 AM"
+      timestamp: new Date().toLocaleTimeString()
     },
-
-    // Portfolio Manager Final Consensus
+    // Liquidity Agent Input
     {
       role: "assistant",
-      content: "Based on all analyses, here's your optimized portfolio strategy for 10 AVAX:\n\n1. Liquidity Provision (7 AVAX):\n   - 4 AVAX in Uniswap AVAX-USDC\n   - 3 AVAX in Curve blizz pool\n\n2. Trading Reserve (3 AVAX):\n   - Set limit orders at $2,200 and $1,850\n\nRationale: This allocation maximizes yield while maintaining trading flexibility. Expected monthly yield: ~10.5% APY\n\nShall I provide step-by-step implementation instructions?",
+      content: "Orca's concentrated liquidity pools for stSOL-SOL offer 15.3% APR with minimal IL risk. RAY-SOL provides higher APR but with increased volatility exposure.",
+      agentName: "Liquidity Agent",
+      collaborationType: "suggestion",
+      timestamp: new Date().toLocaleTimeString()
+    },
+    // Final Portfolio Decision
+    {
+      role: "assistant",
+      content: "Based on all inputs, here's the optimal allocation for your 100 SOL:\n\n1. 40 SOL → Marinade Finance (stSOL)\n2. Use stSOL as collateral on Solend to borrow USDC\n3. 30 SOL �� Orca stSOL-SOL concentrated liquidity pool\n4. 30 SOL → Split between Raydium RAY-SOL and ORCA-SOL pools\n\nEstimated total APY: 18.4%\nRisk Level: Moderate\n\nShall I proceed with this allocation?",
       agentName: "Portfolio Manager",
       collaborationType: "decision",
-      timestamp: "10:32 AM"
+      timestamp: new Date().toLocaleTimeString()
     }
   ],
-  "What are the best yield opportunities across DeFi right now, considering risks and TVL?": [
-    // Portfolio Manager Initial Analysis
+  "Ok proceed with this allocation but I have only 1 SOL to invest": [
     {
       role: "assistant",
-      content: "I'll analyze current DeFi yield opportunities with a focus on risk assessment and TVL stability. Let me coordinate with our specialists.",
+      content: "I understand your concern. Let's adjust the allocation to fit your 1 SOL. I'll provide a new recommendation.",
+      agentName: "Portfolio Manager",
+      collaborationType: "suggestion",
+      timestamp: new Date().toLocaleTimeString()
+    },
+    {
+      role: "assistant",
+      content: "Based on your 1 SOL, I recommend the following:\n1. 1 SOL → Marinade Finance (stSOL)\n2. Use stSOL as collateral on Solend to borrow USDC\n3. 1 SOL → Orca stSOL-SOL concentrated liquidity pool\n4. 1 SOL → Split between Raydium RAY-SOL and ORCA-SOL pools\n\nEstimated total APY: 18.4%\nRisk Level: Moderate\n\nShall I proceed with this allocation?",
+      agentName: "Portfolio Manager",
+      collaborationType: "decision",
+      timestamp: new Date().toLocaleTimeString()
+    }
+
+  ],
+  "Find the best arbitrage opportunities between Jupiter and Orca for SOL-USDC pairs": [
+    // Trading Agent Analysis
+    {
+      role: "assistant",
+      content: "Analyzing price disparities and liquidity depths across Jupiter aggregator and Orca pools for SOL-USDC trading pairs.",
+      agentName: "Trading Agent",
+      collaborationType: "analysis",
+      timestamp: new Date().toLocaleTimeString()
+    },
+    // DeFi Analytics Input
+    {
+      role: "assistant",
+      content: "Current market data:\n- Jupiter best SOL/USDC: $101.25\n- Orca SOL/USDC CL pool: $101.45\n- 24h volume: $24.5M\n- Liquidity depth: 45,000 SOL",
+      agentName: "DeFi Analytics",
+      collaborationType: "data",
+      timestamp: new Date().toLocaleTimeString()
+    },
+    // Research Agent Analysis
+    {
+      role: "assistant",
+      content: "Historical spread analysis shows optimal execution during UTC 2-4AM. Average profitable spread: 0.15-0.3%. Current market volatility suggests increased opportunities.",
+      agentName: "Research Agent",
+      collaborationType: "analysis",
+      timestamp: new Date().toLocaleTimeString()
+    },
+    // Portfolio Manager Decision
+    {
+      role: "assistant",
+      content: "Arbitrage opportunity detected:\n1. Buy 10 SOL on Jupiter at $101.25\n2. Sell on Orca CL pool at $101.45\nPotential profit: 0.2% (minus fees)\n\nRecommendation: Set up automated arbitrage with 20 SOL capital, 0.15% minimum spread threshold. Shall I proceed?",
+      agentName: "Portfolio Manager",
+      collaborationType: "decision",
+      timestamp: new Date().toLocaleTimeString()
+    }
+  ],
+
+  "What's the safest way to earn yield on 1000 USDC on Solana?": [
+    // Risk Analysis
+    {
+      role: "assistant",
+      content: "Analyzing lowest-risk yield strategies for USDC on Solana. Prioritizing protocol security and stable returns.",
       agentName: "Portfolio Manager",
       collaborationType: "analysis",
-      timestamp: "2:45 PM"
+      timestamp: new Date().toLocaleTimeString()
     },
-
-    // DeFi Analytics Agent
+    // DeFi Analytics Data
     {
       role: "assistant",
-      content: "Protocol TVL Analysis:\n1. AAVE: $5.2B (↑2% week)\n2. Curve: $3.8B (stable)\n3. Convex: $3.1B (↑5% week)\n\nRisk Metrics:\n- Smart Contract Risk: Low-Medium\n- Protocol Maturity: High\n- Audit Status: All Recently Audited",
+      content: "Current stable yields:\n- Solend Main Pool USDC: 5.8% APY\n- Mango Markets USDC: 6.2% APY\n- UXD Protocol USDC: 4.9% APY\nAll protocols audited and battle-tested.",
       agentName: "DeFi Analytics",
-      collaborationType: "suggestion",
-      timestamp: "2:46 PM"
+      collaborationType: "data",
+      timestamp: new Date().toLocaleTimeString()
     },
-
-    // Liquidity Agent
+    // Lending Agent Analysis
     {
       role: "assistant",
-      content: "Top Stable Opportunities:\n1. Curve tricrypto pool: 8.2% APY\n2. Convex stETH pool: 7.5% APY\n3. AAVE USDC lending: 4.8% APY\n\nVolatility Index: Low for all mentioned pools",
-      agentName: "Liquidity Pool Agent",
+      content: "Solend's main pool offers the best security-to-yield ratio. Multiple audits, insurance fund, and consistent utilization rate of 80%. Recommend starting with their isolated lending pool.",
+      agentName: "Lending Agent",
       collaborationType: "suggestion",
-      timestamp: "2:46 PM"
+      timestamp: new Date().toLocaleTimeString()
     },
-
-    // Trading Agent
+    // Research Agent Input
     {
       role: "assistant",
-      content: "Market Correlation Analysis:\n- Curve pools showing 0.3 correlation with ETH price\n- Lending rates expected to increase with upcoming Fed meeting\n- Volume analysis suggests stable liquidity in major pools",
-      agentName: "Trading Agent",
-      collaborationType: "suggestion",
-      timestamp: "2:47 PM"
+      content: "Protocol risk analysis:\n- Solend: 95/100 safety score\n- Mango: 92/100 safety score\n- UXD: 88/100 safety score\nBased on TVL, audit history, and track record.",
+      agentName: "Research Agent",
+      collaborationType: "analysis",
+      timestamp: new Date().toLocaleTimeString()
     },
-
-    // Final Consensus
+    // Final Recommendation
     {
       role: "assistant",
-      content: "Based on comprehensive analysis, here are the top yield opportunities ranked by risk-adjusted returns:\n\n1. Best Safe Yield:\n   - Curve tricrypto pool (8.2% APY)\n   - Risk: Low, TVL: $825M\n\n2. Best Moderate Risk:\n   - Convex stETH pool (7.5% APY)\n   - Additional CRV rewards possible\n\n3. Best Conservative:\n   - AAVE USDC lending (4.8% APY)\n   - Lowest risk, highest liquidity\n\nRecommended Strategy:\n- Split allocation: 40% tricrypto, 40% stETH, 20% lending\n- Set up alerts for rate changes above 2%\n\nWould you like detailed entry instructions for any of these opportunities?",
+      content: "Recommended safe yield strategy:\n1. Deploy 700 USDC to Solend Main Pool (5.8% APY)\n2. 300 USDC to Mango Markets (6.2% APY)\n\nEstimated blended APY: 5.9%\nRisk Level: Low\nDiversification: 2 top protocols\n\nShall I proceed with this allocation?",
       agentName: "Portfolio Manager",
       collaborationType: "decision",
-      timestamp: "2:47 PM"
+      timestamp: new Date().toLocaleTimeString()
     }
-  ],
-
+  ]
 };
 
 // Add a mapping for agent images
 const agentImages = {
   trading: '/agent_trader.png',
-  research: '/agent_researcher.png',
+  research: '/staking-agent.png',
   liquidity: '/agent_liquidity.png',
   portfolio: '/agent_analyst.png',
   'defi-analytics': '/agent_default.png',
   lending: '/agent_analyst.png',
-  staking: '/agent_researcher.png',
-  'solana-assistant': '/agent_default.png'
+  staking: '/staking-agent.png',
+  'solana-assistant': '/solana-agent.png'
 } as const;
 
 export default function Home() {
@@ -213,7 +264,7 @@ export default function Home() {
 
         setMessages([{
           role: "assistant",
-          content: "Hello! I'm SolMate, your AI portfolio manager. I can help you manage your DeFi portfolio on Avalanche. What would you like to do?",
+          content: "Hello! I'm SolMate, your AI portfolio manager. I can help you manage your DeFi portfolio on Solana. What would you like to do?",
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }]);
       } catch (error) {
@@ -283,7 +334,7 @@ export default function Home() {
           isProcessing: false,
           systemEvents: [...prev.systemEvents, {
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            event: 'Example scenario completed',
+            event: 'Consensus reached',
             type: 'success'
           }]
         }));
@@ -376,58 +427,153 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || agentState.isProcessing) return;
-    handleMessage(input);
+    if (!input.trim() || !selectedAgent || isProcessing) return;
+
+    const userMessage = {
+        role: "user" as const,
+        content: input,
+        timestamp: new Date().toLocaleTimeString()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
     setInput("");
+    setIsProcessing(true);
+
+    try {
+        const response = await handleAgentInteraction(selectedAgent.id, input);
+        
+        setMessages(prev => [...prev, {
+            role: "assistant",
+            content: response,
+            timestamp: new Date().toLocaleTimeString()
+        }]);
+
+    } catch (error) {
+        console.error("Error processing message:", error);
+        setMessages(prev => [...prev, {
+            role: "assistant",
+            content: "Sorry, I encountered an error processing your request. Please try again.",
+            timestamp: new Date().toLocaleTimeString()
+        }]);
+    } finally {
+        setIsProcessing(false);
+    }
   };
 
-  return (
-    <main className="flex my-16 ">
-      {/* Left Sidebar - Agent Details */}
-      <div className="w-1/4 border-r border-gray-200 p-4 overflow-y-auto">
-        <h2 className="text-lg font-semibold mb-4">Available Agents</h2>
-        {agents.map((agent) => {
-          // Get the image source with a fallback
-          const imageSrc = agentImages[agent.id as keyof typeof agentImages] || '/agent_default.png';
+  // Add this state for pagination
+  const [currentPage, setCurrentPage] = useState(0);
+  const AGENTS_PER_PAGE = 4;
 
-          return (
-            <div
-              key={agent.id}
-              className={`p-4 mb-4 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${agentState.activeAgent === agent.id ? 'bg-blue-50 border border-blue-200' : 'bg-white border'
+  // Add pagination controls
+  const totalPages = Math.ceil(agents.length / AGENTS_PER_PAGE);
+  const paginatedAgents = agents.slice(
+    currentPage * AGENTS_PER_PAGE,
+    (currentPage + 1) * AGENTS_PER_PAGE
+  );
+
+  return (
+    <main className="flex  h-[calc(100vh-8rem)]">
+      {/* Left Sidebar - Agent Details */}
+      <div className="w-1/4 border-r border-gray-200 p-4 flex flex-col">
+        <h2 className="text-lg font-semibold mb-4">Available Agents</h2>
+        
+        {/* Agents Container with fixed height */}
+        <div className="flex-1 overflow-y-auto mb-4">
+          {paginatedAgents.map((agent) => {
+            const imageSrc = agentImages[agent.id as keyof typeof agentImages] || '/agent_default.png';
+            
+            return (
+              <div
+                key={agent.id}
+                className={`p-4 mb-4 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
+                  agentState.activeAgent === agent.id ? 'bg-blue-50 border border-blue-200' : 'bg-white border'
                 }`}
-            >
-              <div className="flex items-center mb-2">
-                <div className="relative w-12 h-12 mr-3">
-                  <Image
-                    src={imageSrc}
-                    alt={agent.name}
-                    width={48}
-                    height={48}
-                    className="rounded-full object-cover"
-                    priority
-                  />
+              >
+                <div className="flex items-center mb-2">
+                  <div className="relative w-12 h-12 mr-3">
+                    <Image
+                      src={imageSrc}
+                      alt={agent.name}
+                      width={48}
+                      height={48}
+                      className="rounded-full"
+                      priority
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-gray-900">{agent.name}</h3>
+                    <p className="text-xs text-gray-500">AI Assistant</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">{agent.name}</h3>
-                  <p className="text-xs text-gray-500">AI Assistant</p>
+
+                {/* Add Capabilities Section */}
+                <div className="mt-3">
+                  <h4 className="text-sm font-medium text-gray-700 mb-1">Capabilities:</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {agent.capabilities?.map((capability, idx) => (
+                      <span
+                        key={idx}
+                        className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full"
+                      >
+                        {capability}
+                      </span>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Add Protocols Section */}
+                <div className="mt-3">
+                  <h4 className="text-sm font-medium text-gray-700 mb-1">Protocols:</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {agent.protocols?.map((protocol, idx) => (
+                      <span
+                        key={idx}
+                        className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full"
+                      >
+                        {protocol}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <p className="text-sm text-gray-600 mt-2">{agent.description}</p>
+                {agentState.activeAgent === agent.id && (
+                  <div className="mt-2 text-xs text-blue-600 flex items-center">
+                    <span className="w-2 h-2 bg-blue-600 rounded-full mr-2 animate-pulse"></span>
+                    Active
+                  </div>
+                )}
               </div>
-              <p className="text-sm text-gray-600 mt-2">{agent.description}</p>
-              {agentState.activeAgent === agent.id && (
-                <div className="mt-2 text-xs text-blue-600 flex items-center">
-                  <span className="w-2 h-2 bg-blue-600 rounded-full mr-2 animate-pulse"></span>
-                  Active
-                </div>
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="flex items-center justify-between border-t pt-4">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+            disabled={currentPage === 0}
+            className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <span className="text-sm text-white">
+            Agents list {currentPage + 1} of {totalPages} total Agent List
+          </span>
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
+            disabled={currentPage === totalPages - 1}
+            className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
       {/* Center - Chat Interface */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col h-full">
         <div className="flex-1 overflow-y-auto p-4">
           {messages.map((message, index) => (
             <div key={index} className={`mb-4 flex ${message.role === 'user' ? 'justify-end' : 'justify-start'
@@ -476,8 +622,8 @@ export default function Home() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Form */}
-        <form onSubmit={handleSubmit} className="border-t p-4">
+        {/* Input Form - Now always visible */}
+        <form onSubmit={handleSubmit} className="border-t p-4 ">
           <div className="flex gap-2">
             <input
               type="text"

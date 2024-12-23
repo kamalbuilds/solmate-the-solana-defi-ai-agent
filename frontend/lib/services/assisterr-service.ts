@@ -11,6 +11,7 @@ interface AssisterrResponse {
 export class AssisterrService {
     private apiKey: string;
 
+
     constructor() {
         this.apiKey = process.env['NEXT_PUBLIC_ASSISTER_API_KEY'] || '';
     }

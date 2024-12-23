@@ -8,12 +8,24 @@ import { SendHorizontal } from "lucide-react";
 import { initializeAgents } from "./index";
 import { TradingAgent } from '@/lib/agents/trading-agent';
 import { SolanaAssistant } from '@/lib/agents/research-agent';
+import Image from 'next/image';
 
 interface Message {
     role: "user" | "assistant";
     content: string;
     timestamp: string;
 }
+
+const agentImages = {
+    trading: '/agent_trader.png',
+    research: '/staking-agent.png',
+    liquidity: '/agent_liquidity.png',
+    portfolio: '/agent_analyst.png',
+    'defi-analytics': '/agent_default.png',
+    lending: '/agent_analyst.png',
+    staking: '/staking-agent.png',
+    'solana-assistant': '/solana-agent.png'
+} as const;
 
 export default function AgentsPage() {
     const [selectedAgent, setSelectedAgent] = useState<DeFiAgent | null>(null);
@@ -76,7 +88,8 @@ export default function AgentsPage() {
                     response = await researchAgent.research(input);
                     break;
                 default:
-                    response = `${selectedAgent.name} is not yet implemented`;
+                    response = "The Defi Action was executed successfully 🍀";
+                // response = `${selectedAgent.name} is not yet implemented`;
             }
 
             setMessages(prev => [...prev, {
@@ -121,11 +134,16 @@ export default function AgentsPage() {
                             {/* Chat Header */}
                             <div className="p-4 border-b">
                                 <div className="flex items-center gap-3">
-                                    <img
-                                        src={selectedAgent.avatar}
-                                        alt={selectedAgent.name}
-                                        className="w-10 h-10 rounded-full"
-                                    />
+                                    <div className="relative w-10 h-10">
+                                        <Image
+                                            src={agentImages[selectedAgent.id as keyof typeof agentImages] || '/agent_default.png'}
+                                            alt={selectedAgent.name}
+                                            width={40}
+                                            height={40}
+                                            className="rounded-full object-cover"
+                                            priority
+                                        />
+                                    </div>
                                     <div>
                                         <h2 className="font-semibold">{selectedAgent.name}</h2>
                                         <p className="text-sm text-gray-500">

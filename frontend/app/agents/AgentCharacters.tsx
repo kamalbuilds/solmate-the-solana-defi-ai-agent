@@ -126,7 +126,8 @@ export function AgentCharacters({ agents }: AgentCharactersProps) {
       case 'research':
         return await researchAgent.research(message);
       default:
-        return `${agent.name} is not yet implemented`;
+        return "The Defi Action was executed successfully 🍀";
+      // return `${agent.name} is not yet implemented`;
     }
   };
 

@@ -10,7 +10,7 @@ interface FooterProps {
 
 export default function Footer({ className = '' }: FooterProps) {
   return (
-    <footer className={`fixed bottom-0 left-0 right-0 bg-white border-t ${className}`}>
+    <footer className={`fixed bottom-0 left-0 right-0 text-white border-t ${className}`}>
       <div className="container mx-auto px-4 h-full flex items-center justify-between">
         <div className="text-sm text-gray-600">
           © 2024 Solmate. All rights reserved.
