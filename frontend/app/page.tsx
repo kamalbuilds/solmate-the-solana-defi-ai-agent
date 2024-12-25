@@ -224,6 +224,53 @@ export default function Home() {
   });
   const [agents, setAgents] = useState<Agent[]>([]);
 
+  const handleAgentInteraction = async (agentId: string, userInput: string) => {
+    const agent = agents.find(a => a.id === agentId);
+    if (!agent) throw new Error('Agent not found');
+    
+    const response = await agent.agent?.invoke(
+      { input: userInput },
+      { configurable: { sessionId: "user-1" } }
+    );
+    
+    return response?.output || 'No response from agent';
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || !agentState.activeAgent || agentState.isProcessing) return;
+
+    const userMessage = {
+      role: "user" as const,
+      content: input,
+      timestamp: new Date().toLocaleTimeString()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput("");
+    setAgentState(prev => ({ ...prev, isProcessing: true }));
+
+    try {
+      const response = await handleAgentInteraction(agentState.activeAgent, input);
+      
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: response,
+        timestamp: new Date().toLocaleTimeString()
+      }]);
+
+    } catch (error) {
+      console.error("Error processing message:", error);
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: "Sorry, I encountered an error processing your request. Please try again.",
+        timestamp: new Date().toLocaleTimeString()
+      }]);
+    } finally {
+      setAgentState(prev => ({ ...prev, isProcessing: false }));
+    }
+  };
+
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const clientRef = useRef<any>(null);
   const agentRef = useRef<any>(null);
@@ -427,41 +474,6 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || !selectedAgent || isProcessing) return;
-
-    const userMessage = {
-        role: "user" as const,
-        content: input,
-        timestamp: new Date().toLocaleTimeString()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInput("");
-    setIsProcessing(true);
-
-    try {
-        const response = await handleAgentInteraction(selectedAgent.id, input);
-        
-        setMessages(prev => [...prev, {
-            role: "assistant",
-            content: response,
-            timestamp: new Date().toLocaleTimeString()
-        }]);
-
-    } catch (error) {
-        console.error("Error processing message:", error);
-        setMessages(prev => [...prev, {
-            role: "assistant",
-            content: "Sorry, I encountered an error processing your request. Please try again.",
-            timestamp: new Date().toLocaleTimeString()
-        }]);
-    } finally {
-        setIsProcessing(false);
-    }
-  };
-
   // Add this state for pagination
   const [currentPage, setCurrentPage] = useState(0);
   const AGENTS_PER_PAGE = 4;
@@ -487,6 +499,7 @@ export default function Home() {
             return (
               <div
                 key={agent.id}
+                onClick={() => setAgentState(prev => ({ ...prev, activeAgent: agent.id }))}
                 className={`p-4 mb-4 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
                   agentState.activeAgent === agent.id ? 'bg-blue-50 border border-blue-200' : 'bg-white border'
                 }`}
